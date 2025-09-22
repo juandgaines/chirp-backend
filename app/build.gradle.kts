@@ -1,28 +1,20 @@
 plugins {
-    alias (libs.plugins.kotlin.jvm)
-    alias (libs.plugins.kotlin.spring)
-    alias (libs.plugins.kotlin.jpa)
-    alias (libs.plugins.spring.boot)
-    alias (libs.plugins.spring.dependency.management)
+    id("chirp.spring-boot-app")
 }
 
 group = "com.juandroiddev"
 version = "0.0.1-SNAPSHOT"
 description = "Chirp backend"
 
-java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
-	}
-}
 
-repositories {
-	mavenCentral()
-	maven { url = uri("https://repo.spring.io/snapshot") }
-}
 
 dependencies {
-	implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation(projects.user)
+    implementation(projects.chat)
+    implementation(projects.notification)
+    implementation(projects.common)
+/*
+*implementation("org.springframework.boot:spring-boot-starter-actuator")
 	implementation("org.springframework.boot:spring-boot-starter-amqp")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-data-redis")
@@ -40,20 +32,5 @@ dependencies {
 	testImplementation("org.springframework.amqp:spring-rabbit-test")
 	testImplementation("org.springframework.security:spring-security-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-}
-
-kotlin {
-	compilerOptions {
-		freeCompilerArgs.addAll("-Xjsr305=strict", "-Xannotation-default-target=param-property")
-	}
-}
-
-allOpen {
-	annotation("jakarta.persistence.Entity")
-	annotation("jakarta.persistence.MappedSuperclass")
-	annotation("jakarta.persistence.Embeddable")
-}
-
-tasks.withType<Test> {
-	useJUnitPlatform()
+* */
 }

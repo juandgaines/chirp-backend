@@ -1,7 +1,6 @@
 import gradle.kotlin.dsl.accessors._6c35dc5b101437ffcd4f7834c90ef9dd.dependencyManagement
 plugins{
     id("chirp.kotlin-common")
-    id("org.springframework.boot")
     id("io.spring.dependency-management")
     kotlin("plugin.jpa")
 }
