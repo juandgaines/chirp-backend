@@ -1,0 +1,34 @@
+import gradle.kotlin.dsl.accessors._6c35dc5b101437ffcd4f7834c90ef9dd.dependencyManagement
+import org.gradle.kotlin.dsl.kotlin
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+plugins{
+    kotlin("jvm")
+    kotlin("plugin.spring")
+    id("io.spring.dependency-management")
+}
+
+repositories {
+    mavenCentral()
+    maven { url = uri("https://repo.spring.io/snapshot") }
+}
+
+configure<KotlinJvmProjectExtension> {
+    jvmToolchain(21)
+}
+
+
+
+tasks.withType<KotlinCompile>{
+    compilerOptions{
+        freeCompilerArgs.addAll("-Xjsr305=strict", "-Xannotation-default-target=param-property")
+        jvmTarget = JvmTarget.JVM_21
+    }
+}
+
+tasks.withType<Test> {
+    useJUnitPlatform()
+}
+
