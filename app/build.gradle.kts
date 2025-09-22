@@ -13,6 +13,8 @@ dependencies {
     implementation(projects.chat)
     implementation(projects.notification)
     implementation(projects.common)
+    implementation(libs.spring.boot.starter.data.jpa)
+    compileOnly(libs.postgresql)
 /*
 *implementation("org.springframework.boot:spring-boot-starter-actuator")
 	implementation("org.springframework.boot:spring-boot-starter-amqp")
