@@ -1,4 +1,4 @@
-package com.juandroiddev.user.domain.model
+package com.juandroiddev.chirp.domain.model
 
 import java.util.UUID
 
