@@ -1,10 +1,12 @@
 package com.juandroiddev.chirp.api.exception_handling
 
+import com.juandroiddev.chirp.domain.exception.InvalidTokenException
 import com.juandroiddev.chirp.domain.exception.UserAlreadyExistsException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
+import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestControllerAdvice
 
 @RestControllerAdvice
@@ -23,6 +25,15 @@ class AuthExceptionHandler {
                 )
             )
     }
+
+    @ExceptionHandler(InvalidTokenException::class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    fun onInvalidTokenException(
+        e: InvalidTokenException
+    ) = mapOf(
+        "code" to "INVALID_TOKEN",
+        "status" to e.message
+    )
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun onValidationException(

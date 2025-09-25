@@ -19,6 +19,10 @@ dependencies {
     implementation(libs.spring.boot.starter.data.jpa)
     runtimeOnly(libs.postgresql)
     implementation(libs.jakarta.persistence.api)
+
+    implementation(libs.jwt.api)
+    implementation(libs.jwt.impl)
+    implementation(libs.jwt.jackson)
     testImplementation(kotlin("test"))
 }
 
