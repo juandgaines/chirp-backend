@@ -1,11 +1,13 @@
 package com.juandroiddev.chirp.controller
 
+import com.juandroiddev.chirp.api.dto.AuthenticatedUserDto
+import com.juandroiddev.chirp.api.dto.LoginRequest
 import com.juandroiddev.chirp.api.dto.RegisterRequest
 import com.juandroiddev.chirp.api.dto.UserDto
+import com.juandroiddev.chirp.api.mappers.toAuthenticatedUserDto
 import com.juandroiddev.chirp.api.mappers.toUserDto
 import com.juandroiddev.chirp.service.auth.AuthService
 import jakarta.validation.Valid
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -27,5 +29,18 @@ class AuthController (
             username = body.username,
             password = body.password
         ).toUserDto()
+    }
+
+    @PostMapping(
+        "/login"
+    )
+    fun login(
+        @RequestBody
+        body: LoginRequest
+    ): AuthenticatedUserDto{
+        return authService.login(
+            usernameOrEmail = body.email,
+            password = body.password
+        ).toAuthenticatedUserDto()
     }
 }
