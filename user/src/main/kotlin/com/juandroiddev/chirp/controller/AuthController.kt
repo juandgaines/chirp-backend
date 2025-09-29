@@ -2,6 +2,7 @@ package com.juandroiddev.chirp.controller
 
 import com.juandroiddev.chirp.api.dto.AuthenticatedUserDto
 import com.juandroiddev.chirp.api.dto.LoginRequest
+import com.juandroiddev.chirp.api.dto.RefreshRequest
 import com.juandroiddev.chirp.api.dto.RegisterRequest
 import com.juandroiddev.chirp.api.dto.UserDto
 import com.juandroiddev.chirp.api.mappers.toAuthenticatedUserDto
@@ -41,6 +42,15 @@ class AuthController (
         return authService.login(
             usernameOrEmail = body.email,
             password = body.password
+        ).toAuthenticatedUserDto()
+    }
+
+    @PostMapping("/refresh")
+    fun refreshToken(
+        @RequestBody body: RefreshRequest
+    ): AuthenticatedUserDto {
+        return  authService.refresh(
+            body.refreshToken
         ).toAuthenticatedUserDto()
     }
 }

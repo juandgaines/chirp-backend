@@ -1,6 +1,7 @@
 package com.juandroiddev.chirp.service.auth
 
 import com.juandroiddev.chirp.domain.exception.InvalidCredentialsException
+import com.juandroiddev.chirp.domain.exception.InvalidTokenException
 import com.juandroiddev.chirp.domain.exception.PasswordEncodeException
 import com.juandroiddev.chirp.domain.exception.UserAlreadyExistsException
 import com.juandroiddev.chirp.domain.exception.UserNotFoundException
@@ -13,7 +14,9 @@ import com.juandroiddev.chirp.infra.database.repositories.RefreshTokenRepository
 import com.juandroiddev.chirp.infra.database.repositories.UserRepository
 import com.juandroiddev.chirp.infra.database.toUser
 import com.juandroiddev.chirp.infra.security.PasswordEncoder
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.Instant
 import java.util.*
 
@@ -49,6 +52,45 @@ class AuthService (
         ).toUser()
 
         return savedUser
+    }
+    @Transactional
+    fun refresh(refreshToken: String): AuthenticatedUser{
+        if(!jwtService.validateRefreshToken(refreshToken)){
+            throw InvalidTokenException(
+                message = "Invalid refresh token"
+            )
+        }
+
+        val userId = jwtService.getUserIdFromToken(refreshToken)
+        val user = userRepository.findByIdOrNull(userId)
+            ?: throw UserNotFoundException()
+
+        val hashed = hashToken(refreshToken)
+
+        return user.id?.let {userId ->
+            refreshTokenRepository.findByUserIdAndHashedToken(
+                userId = userId,
+                hashedToken = hashed
+            )?: throw InvalidTokenException("Invalid refresh token")
+
+            refreshTokenRepository.deleteByUserIdAndHashedToken(
+                userId = userId,
+                hashedToken = hashed
+            )
+            val newAccessToken = jwtService.generateAccessToken(userId)
+            val newRefreshToken = jwtService.generateRefreshToken(userId)
+
+            storeRefreshToken(
+                userId = userId,
+                token = newRefreshToken
+            )
+            AuthenticatedUser(
+                user = user.toUser(),
+                accessToken = newAccessToken,
+                refreshToken = newRefreshToken
+            )
+        }?: throw UserNotFoundException()
+
     }
 
     fun login(

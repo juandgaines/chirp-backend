@@ -7,8 +7,8 @@
 curl -X POST http://localhost:8080/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
-    "username": "testuser",
-    "email": "testuser@example.com",
+    "username": "testuser1",
+    "email": "testuser1@example.com",
     "password": "TestPassword123!"
   }'
 ```
@@ -18,8 +18,17 @@ curl -X POST http://localhost:8080/api/auth/register \
 curl -X POST http://localhost:8080/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "testuser@example.com",
+    "email": "testuser1@example.com",
     "password": "TestPassword123!"
+  }'
+```
+
+### 3. Refresh Token
+```bash
+curl -X POST http://localhost:8080/api/auth/refresh \
+  -H "Content-Type: application/json" \
+  -d '{
+    "refreshToken": "YOUR_REFRESH_TOKEN_HERE"
   }'
 ```
 
