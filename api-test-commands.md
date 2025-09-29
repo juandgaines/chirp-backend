@@ -32,6 +32,15 @@ curl -X POST http://localhost:8080/api/auth/refresh \
   }'
 ```
 
+### 4. Logout
+```bash
+curl -X POST http://localhost:8080/api/auth/logout \
+  -H "Content-Type: application/json" \
+  -d '{
+    "refreshToken": "YOUR_REFRESH_TOKEN_HERE"
+  }'
+```
+
 ## Test Different Scenarios
 
 ### Registration - Invalid Email
