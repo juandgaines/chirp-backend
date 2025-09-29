@@ -12,7 +12,7 @@ import com.juandroiddev.chirp.infra.database.entities.RefreshTokenEntity
 import com.juandroiddev.chirp.infra.database.entities.UserEntity
 import com.juandroiddev.chirp.infra.database.repositories.RefreshTokenRepository
 import com.juandroiddev.chirp.infra.database.repositories.UserRepository
-import com.juandroiddev.chirp.infra.database.toUser
+import com.juandroiddev.chirp.infra.database.mappers.toUser
 import com.juandroiddev.chirp.infra.security.PasswordEncoder
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
