@@ -41,6 +41,11 @@ curl -X POST http://localhost:8080/api/auth/logout \
   }'
 ```
 
+### 5. Verify Email
+```bash
+curl -X GET "http://localhost:8080/api/auth/verify?token=YOUR_TOKEN_HERE"
+```
+
 ## Test Different Scenarios
 
 ### Registration - Invalid Email

@@ -1,23 +1,18 @@
 package com.juandroiddev.chirp.controller
 
-import com.juandroiddev.chirp.api.dto.AuthenticatedUserDto
-import com.juandroiddev.chirp.api.dto.LoginRequest
-import com.juandroiddev.chirp.api.dto.RefreshRequest
-import com.juandroiddev.chirp.api.dto.RegisterRequest
-import com.juandroiddev.chirp.api.dto.UserDto
+import com.juandroiddev.chirp.api.dto.*
 import com.juandroiddev.chirp.api.mappers.toAuthenticatedUserDto
 import com.juandroiddev.chirp.api.mappers.toUserDto
 import com.juandroiddev.chirp.service.auth.AuthService
+import com.juandroiddev.chirp.service.auth.EmailVerificationService
 import jakarta.validation.Valid
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/auth")
 class AuthController (
-    private val authService: AuthService
+    private val authService: AuthService,
+    private val emailVerificationService: EmailVerificationService
 ){
 
     @PostMapping("/register")
@@ -63,4 +58,14 @@ class AuthController (
             body.refreshToken
         )
     }
+    @GetMapping(
+        "/verify"
+    )
+    fun verifyEmail(
+        @RequestParam
+        token: String
+    ){
+        emailVerificationService.verifyEmail(token)
+    }
+
 }

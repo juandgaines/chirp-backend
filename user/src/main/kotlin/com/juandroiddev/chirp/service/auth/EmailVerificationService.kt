@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit
 class EmailVerificationService(
     private val emailVerificationTokenRepository: EmailVerificationTokenRepository,
     private val userRepository: UserRepository,
-    @param:Value("\${chirp.email.expiry-hours}")
+    @param:Value("\${chirp.email.verification.expiry-hours}")
     private val expiryHours:Long
 ) {
     @Transactional

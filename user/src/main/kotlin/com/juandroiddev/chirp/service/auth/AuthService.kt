@@ -1,5 +1,6 @@
 package com.juandroiddev.chirp.service.auth
 
+import com.juandroiddev.chirp.domain.exception.EmailNotVerifiedException
 import com.juandroiddev.chirp.domain.exception.InvalidCredentialsException
 import com.juandroiddev.chirp.domain.exception.InvalidTokenException
 import com.juandroiddev.chirp.domain.exception.PasswordEncodeException
@@ -23,14 +24,16 @@ import java.util.*
 @Service
 class AuthService (
     private val userRepository: UserRepository,
-    private val refreshTokenRepository: RefreshTokenRepository,
     private val passwordEncoder: PasswordEncoder,
-    private val jwtService: JWTService
+    private val jwtService: JWTService,
+    private val refreshTokenRepository: RefreshTokenRepository,
+    private val emailVerificationService: EmailVerificationService
 ){
+    @Transactional
     fun register(email: String, username: String, password: String): User {
-
+        val trimmedEmail = email.trim()
         val user = userRepository.findByEmailOrUsername(
-            email = email.trim(),
+            email =trimmedEmail,
             username = username.trim()
         )
 
@@ -43,13 +46,15 @@ class AuthService (
         val hashedPassword = passwordEncoder.encode(password) ?:
             throw PasswordEncodeException()
 
-        val savedUser = userRepository.save(
+
+        val savedUser = userRepository.saveAndFlush(
             UserEntity(
-                email = email,
+                email = trimmedEmail,
                 username = username,
                 hashedPassword = hashedPassword
             )
         ).toUser()
+        val token = emailVerificationService.createVerification(trimmedEmail)
 
         return savedUser
     }
@@ -112,10 +117,10 @@ class AuthService (
         if (!passwordEncoder.matches(password, user.hashedPassword)){
             throw InvalidCredentialsException()
         }
-        //TODO: check for verified email
-
-
-        return user.id?.let { userId->
+        if (!user.hasEmailVerified){
+            throw EmailNotVerifiedException()
+        }
+       return user.id?.let { userId->
             val accessToken = jwtService.generateAccessToken(userId)
             val refreshToken = jwtService.generateRefreshToken(userId)
             storeRefreshToken(
