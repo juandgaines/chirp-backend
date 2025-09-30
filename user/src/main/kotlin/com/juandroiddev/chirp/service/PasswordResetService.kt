@@ -1,10 +1,6 @@
 package com.juandroiddev.chirp.service
 
-import com.juandroiddev.chirp.domain.exception.InvalidCredentialsException
-import com.juandroiddev.chirp.domain.exception.InvalidTokenException
-import com.juandroiddev.chirp.domain.exception.PasswordEncodeException
-import com.juandroiddev.chirp.domain.exception.SamePasswordException
-import com.juandroiddev.chirp.domain.exception.UserNotFoundException
+import com.juandroiddev.chirp.domain.exception.*
 import com.juandroiddev.chirp.domain.model.UserId
 import com.juandroiddev.chirp.infra.database.entities.PasswordResetTokenEntity
 import com.juandroiddev.chirp.infra.database.repositories.PasswordResetTokenRepository
@@ -16,7 +12,6 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
-import org.springframework.web.bind.annotation.PostMapping
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
