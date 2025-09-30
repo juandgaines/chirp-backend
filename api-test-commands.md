@@ -46,6 +46,25 @@ curl -X POST http://localhost:8080/api/auth/logout \
 curl -X GET "http://localhost:8080/api/auth/verify?token=YOUR_TOKEN_HERE"
 ```
 
+### 6. Request Password Reset (Forgot Password)
+```bash
+curl -X POST http://localhost:8080/api/auth/forgot-password \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "testuser1@example.com"
+  }'
+```
+
+### 7. Reset Password (with token from email)
+```bash
+curl -X POST http://localhost:8080/api/auth/reset-password \
+  -H "Content-Type: application/json" \
+  -d '{
+    "token": "YOUR_RESET_TOKEN_HERE",
+    "newPassword": "NewPassword123!"
+  }'
+```
+
 ## Test Different Scenarios
 
 ### Registration - Invalid Email

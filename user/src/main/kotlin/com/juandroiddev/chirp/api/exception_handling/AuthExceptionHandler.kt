@@ -3,6 +3,7 @@ package com.juandroiddev.chirp.api.exception_handling
 import com.juandroiddev.chirp.domain.exception.EmailNotVerifiedException
 import com.juandroiddev.chirp.domain.exception.InvalidCredentialsException
 import com.juandroiddev.chirp.domain.exception.InvalidTokenException
+import com.juandroiddev.chirp.domain.exception.SamePasswordException
 import com.juandroiddev.chirp.domain.exception.UserAlreadyExistsException
 import com.juandroiddev.chirp.domain.exception.UserNotFoundException
 import org.springframework.http.HttpStatus
@@ -63,6 +64,15 @@ class AuthExceptionHandler {
         e: InvalidCredentialsException
     ) = mapOf(
         "code" to "INVALID_CREDENTIALS",
+        "status" to e.message
+    )
+
+    @ExceptionHandler(SamePasswordException::class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    fun onInvalidTokenException(
+        e: SamePasswordException
+    ) = mapOf(
+        "code" to "SAME_PASSWORD",
         "status" to e.message
     )
 
