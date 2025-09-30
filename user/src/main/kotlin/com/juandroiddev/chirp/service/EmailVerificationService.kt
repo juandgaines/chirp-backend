@@ -1,4 +1,4 @@
-package com.juandroiddev.chirp.service.auth
+package com.juandroiddev.chirp.service
 
 import com.juandroiddev.chirp.domain.exception.InvalidTokenException
 import com.juandroiddev.chirp.domain.exception.UserNotFoundException
@@ -14,7 +14,6 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.time.Instant
 import java.time.temporal.ChronoUnit
-import java.util.concurrent.TimeUnit
 
 @Service
 class EmailVerificationService(

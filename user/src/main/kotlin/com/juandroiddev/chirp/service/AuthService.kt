@@ -1,4 +1,4 @@
-package com.juandroiddev.chirp.service.auth
+package com.juandroiddev.chirp.service
 
 import com.juandroiddev.chirp.domain.exception.EmailNotVerifiedException
 import com.juandroiddev.chirp.domain.exception.InvalidCredentialsException
@@ -18,6 +18,7 @@ import com.juandroiddev.chirp.infra.security.PasswordEncoder
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.security.MessageDigest
 import java.time.Instant
 import java.util.*
 
@@ -150,7 +151,7 @@ class AuthService (
     }
 
     private fun hashToken(token:String):String{
-       val digest = java.security.MessageDigest.getInstance("SHA-256")
+       val digest = MessageDigest.getInstance("SHA-256")
         val hashBytes = digest.digest(token.encodeToByteArray())
         return Base64.getEncoder().encodeToString(hashBytes)
     }
