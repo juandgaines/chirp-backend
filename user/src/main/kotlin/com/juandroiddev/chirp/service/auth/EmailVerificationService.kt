@@ -88,7 +88,8 @@ class EmailVerificationService(
 
 
     @Scheduled(
-        cron = "0 0 3 * * *"
+        cron = "0 0 3 * * *",
+        zone = "UTC"
     )
     fun cleanUpExpiredTokens(){
         emailVerificationTokenRepository.deleteByExpiresAtLessThan(
