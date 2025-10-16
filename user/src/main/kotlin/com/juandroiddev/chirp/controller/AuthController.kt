@@ -3,6 +3,7 @@ package com.juandroiddev.chirp.controller
 import com.juandroiddev.chirp.api.dto.*
 import com.juandroiddev.chirp.api.mappers.toAuthenticatedUserDto
 import com.juandroiddev.chirp.api.mappers.toUserDto
+import com.juandroiddev.chirp.infra.rate_limiting.EmailRateLimiter
 import com.juandroiddev.chirp.service.AuthService
 import com.juandroiddev.chirp.service.EmailVerificationService
 import com.juandroiddev.chirp.service.PasswordResetService
@@ -14,7 +15,8 @@ import org.springframework.web.bind.annotation.*
 class AuthController (
     private val authService: AuthService,
     private val emailVerificationService: EmailVerificationService,
-    private val passwordResetService: PasswordResetService
+    private val passwordResetService: PasswordResetService,
+    private val emailRateLimiter: EmailRateLimiter
 ){
 
     @PostMapping("/register")
@@ -60,6 +62,16 @@ class AuthController (
             body.refreshToken
         )
     }
+    @PostMapping("/resend-verification")
+    fun resendVerification(
+        @Valid
+        @RequestBody
+        body: EmailRequest
+    ){
+        emailRateLimiter.withRateLimit(body.email){
+            emailVerificationService.resendVerification(body.email)
+        }
+    }
     @GetMapping(
         "/verify"
     )
@@ -79,6 +91,7 @@ class AuthController (
             email = body.email
         )
     }
+
 
 
     @PostMapping("/reset-password")

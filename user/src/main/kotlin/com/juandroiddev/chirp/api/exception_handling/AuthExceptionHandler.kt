@@ -3,6 +3,7 @@ package com.juandroiddev.chirp.api.exception_handling
 import com.juandroiddev.chirp.domain.exception.EmailNotVerifiedException
 import com.juandroiddev.chirp.domain.exception.InvalidCredentialsException
 import com.juandroiddev.chirp.domain.exception.InvalidTokenException
+import com.juandroiddev.chirp.domain.exception.RateLimitException
 import com.juandroiddev.chirp.domain.exception.SamePasswordException
 import com.juandroiddev.chirp.domain.exception.UserAlreadyExistsException
 import com.juandroiddev.chirp.domain.exception.UserNotFoundException
@@ -46,6 +47,15 @@ class AuthExceptionHandler {
         e: InvalidTokenException
     ) = mapOf(
         "code" to "INVALID_TOKEN",
+        "status" to e.message
+    )
+
+    @ExceptionHandler(RateLimitException::class)
+    @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
+    fun onRateLimit(
+        e: RateLimitException
+    ) = mapOf(
+        "code" to "RATE_LIMIT_EXCEEDED",
         "status" to e.message
     )
 

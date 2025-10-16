@@ -17,6 +17,7 @@ dependencies {
     implementation(libs.spring.boot.starter.validation)
 
     implementation(libs.spring.boot.starter.data.jpa)
+    implementation(libs.spring.boot.starter.data.redis)
     runtimeOnly(libs.postgresql)
     implementation(libs.jakarta.persistence.api)
 
