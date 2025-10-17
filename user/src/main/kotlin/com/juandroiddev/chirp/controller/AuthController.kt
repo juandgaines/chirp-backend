@@ -1,5 +1,6 @@
 package com.juandroiddev.chirp.controller
 
+import com.juandroiddev.chirp.api.config.IpRateLimit
 import com.juandroiddev.chirp.api.dto.*
 import com.juandroiddev.chirp.api.mappers.toAuthenticatedUserDto
 import com.juandroiddev.chirp.api.mappers.toUserDto
@@ -9,6 +10,7 @@ import com.juandroiddev.chirp.service.EmailVerificationService
 import com.juandroiddev.chirp.service.PasswordResetService
 import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.*
+import java.util.concurrent.TimeUnit
 
 @RestController
 @RequestMapping("/api/auth")
@@ -20,6 +22,11 @@ class AuthController (
 ){
 
     @PostMapping("/register")
+    @IpRateLimit(
+        duration = 1L,
+        unit = TimeUnit.HOURS,
+        requests = 10
+    )
     fun register(
         @Valid
         @RequestBody body: RegisterRequest
@@ -34,6 +41,11 @@ class AuthController (
     @PostMapping(
         "/login"
     )
+    @IpRateLimit(
+        duration = 1L,
+        unit = TimeUnit.HOURS,
+        requests = 10
+    )
     fun login(
         @RequestBody
         body: LoginRequest
@@ -45,6 +57,11 @@ class AuthController (
     }
 
     @PostMapping("/refresh")
+    @IpRateLimit(
+        duration = 1L,
+        unit = TimeUnit.HOURS,
+        requests = 10
+    )
     fun refreshToken(
         @RequestBody body: RefreshRequest
     ): AuthenticatedUserDto {
@@ -63,6 +80,11 @@ class AuthController (
         )
     }
     @PostMapping("/resend-verification")
+    @IpRateLimit(
+        duration = 1L,
+        unit = TimeUnit.HOURS,
+        requests = 10
+    )
     fun resendVerification(
         @Valid
         @RequestBody
@@ -82,6 +104,11 @@ class AuthController (
         emailVerificationService.verifyEmail(token)
     }
     @PostMapping("/forgot-password")
+    @IpRateLimit(
+        duration = 1L,
+        unit = TimeUnit.HOURS,
+        requests = 10
+    )
     fun forgotPassword(
         @Valid
         @RequestBody
