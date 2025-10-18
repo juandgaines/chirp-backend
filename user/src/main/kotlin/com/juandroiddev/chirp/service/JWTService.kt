@@ -28,7 +28,7 @@ class JWTService(
     fun generateRefreshToken(userId: UserId): String =
         generateToken(userId, type = "refresh", expire = refreshTokenValidityMS)
 
-    fun validateToken(token: String): Boolean {
+    fun validateAccessToken(token: String): Boolean {
         val claims = parseAllClaims(token) ?: return false
         val tokenType = claims["type"] as? String ?: return false
         return tokenType == "access"

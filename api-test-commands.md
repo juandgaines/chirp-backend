@@ -65,6 +65,26 @@ curl -X POST http://localhost:8080/api/auth/reset-password \
   }'
 ```
 
+### 8. Change Password (Authenticated users only)
+```bash
+curl -X POST http://localhost:8080/api/auth/change-password \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE" \
+  -d '{
+    "oldPassword": "TestPassword123!",
+    "newPassword": "TestPassword1234!"
+  }'
+```
+
+### 9. Resend Verification Email
+```bash
+curl -X POST http://localhost:8080/api/auth/resend-verification \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "testuser1@example.com"
+  }'
+```
+
 ## Test Different Scenarios
 
 ### Registration - Invalid Email
@@ -106,6 +126,27 @@ curl -X POST http://localhost:8080/api/auth/login \
   -d '{
     "email": "nonexistent@example.com",
     "password": "TestPassword123!"
+  }'
+```
+
+### Change Password - Wrong Old Password
+```bash
+curl -X POST http://localhost:8080/api/auth/change-password \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN_HERE" \
+  -d '{
+    "oldPassword": "WrongOldPassword123!",
+    "newPassword": "NewSecurePassword123!"
+  }'
+```
+
+### Change Password - Without Authentication
+```bash
+curl -X POST http://localhost:8080/api/auth/change-password \
+  -H "Content-Type: application/json" \
+  -d '{
+    "oldPassword": "TestPassword123!",
+    "newPassword": "NewSecurePassword123!"
   }'
 ```
 
