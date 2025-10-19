@@ -4,11 +4,7 @@ plugins{
     id("io.spring.dependency-management")
     kotlin("plugin.jpa")
 }
-dependencyManagement{
-    imports {
-        mavenBom("org.springframework.boot:spring-boot-dependencies:${libraries.findVersion("spring-boot").get()}")
-    }
-}
+
 dependencies{
     "implementation"(libraries.findLibrary("kotlin-reflect").get())
     "implementation"(libraries.findLibrary("kotlin-stdlib").get())
