@@ -1,6 +1,7 @@
 package com.juandroiddev.chirp.api.dto
 
-import com.juandroiddev.chirp.domain.model.UserId
+import com.juandroiddev.chirp.domain.type.UserId
+
 
 data class UserDto(
     val id: UserId,

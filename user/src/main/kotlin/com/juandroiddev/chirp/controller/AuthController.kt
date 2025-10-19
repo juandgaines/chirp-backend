@@ -5,13 +5,11 @@ import com.juandroiddev.chirp.api.dto.*
 import com.juandroiddev.chirp.api.mappers.toAuthenticatedUserDto
 import com.juandroiddev.chirp.api.mappers.toUserDto
 import com.juandroiddev.chirp.api.util.requestUserId
-import com.juandroiddev.chirp.domain.model.UserId
 import com.juandroiddev.chirp.infra.rate_limiting.EmailRateLimiter
 import com.juandroiddev.chirp.service.AuthService
 import com.juandroiddev.chirp.service.EmailVerificationService
 import com.juandroiddev.chirp.service.PasswordResetService
 import jakarta.validation.Valid
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.*
 import java.util.concurrent.TimeUnit
 

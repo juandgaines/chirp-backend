@@ -1,13 +1,7 @@
 package com.juandroiddev.chirp.infra.database.entities
 
-import com.juandroiddev.chirp.domain.model.UserId
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.Index
-import jakarta.persistence.Table
+import com.juandroiddev.chirp.domain.type.UserId
+import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.UpdateTimestamp
 import java.time.Instant
@@ -29,7 +23,7 @@ class UserEntity(
 
     @Column(nullable = false, unique = true)
     var email: String,
-    
+
     @Column(nullable = false, unique = true)
     var username: String,
 

@@ -1,6 +1,6 @@
 package com.juandroiddev.chirp.infra.database.repositories
 
-import com.juandroiddev.chirp.domain.model.UserId
+import com.juandroiddev.chirp.domain.type.UserId
 import com.juandroiddev.chirp.infra.database.entities.UserEntity
 import org.springframework.data.jpa.repository.JpaRepository
 

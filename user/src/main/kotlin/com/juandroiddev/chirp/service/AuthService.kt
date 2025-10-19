@@ -8,7 +8,7 @@ import com.juandroiddev.chirp.domain.exception.UserAlreadyExistsException
 import com.juandroiddev.chirp.domain.exception.UserNotFoundException
 import com.juandroiddev.chirp.domain.model.AuthenticatedUser
 import com.juandroiddev.chirp.domain.model.User
-import com.juandroiddev.chirp.domain.model.UserId
+import com.juandroiddev.chirp.domain.type.UserId
 import com.juandroiddev.chirp.infra.database.entities.RefreshTokenEntity
 import com.juandroiddev.chirp.infra.database.entities.UserEntity
 import com.juandroiddev.chirp.infra.database.repositories.RefreshTokenRepository
@@ -136,7 +136,7 @@ class AuthService (
         }?: throw UserNotFoundException()
     }
 
-    private fun storeRefreshToken(userId: UserId,token:String){
+    private fun storeRefreshToken(userId: UserId, token:String){
         val hashedToken = hashToken(token)
         val expiryMs = jwtService.refreshTokenValidityMS
         val expiresAt = Instant.now().plusMillis(expiryMs)

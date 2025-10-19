@@ -1,8 +1,7 @@
 package com.juandroiddev.chirp.domain.model
 
-import java.util.UUID
+import com.juandroiddev.chirp.domain.type.UserId
 
-typealias UserId = UUID
 
 data class User(
     val id: UserId,

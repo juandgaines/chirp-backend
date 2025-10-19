@@ -1,6 +1,6 @@
 package com.juandroiddev.chirp.infra.database.entities
 
-import com.juandroiddev.chirp.domain.model.UserId
+import com.juandroiddev.chirp.domain.type.UserId
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue

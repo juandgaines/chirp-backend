@@ -1,7 +1,7 @@
 package com.juandroiddev.chirp.service
 
 import com.juandroiddev.chirp.domain.exception.*
-import com.juandroiddev.chirp.domain.model.UserId
+import com.juandroiddev.chirp.domain.type.UserId
 import com.juandroiddev.chirp.infra.database.entities.PasswordResetTokenEntity
 import com.juandroiddev.chirp.infra.database.repositories.PasswordResetTokenRepository
 import com.juandroiddev.chirp.infra.database.repositories.RefreshTokenRepository
