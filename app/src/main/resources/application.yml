@@ -1,56 +1,76 @@
 spring:
   application:
-    name: chirp
+    name: chirp  # Application identifier used for service discovery and distributed tracing
   data:
     redis:
-      host: "redis-12989.c267.us-east-1-4.ec2.redns.redis-cloud.com"
-      password: "${REDIS_PASSWORD}"
-      username: "default"
-      port: 12989
-      connection-timeout: 5000ms
-      timeout: 2000ms
+      host: "redis-12989.c267.us-east-1-4.ec2.redns.redis-cloud.com"  # Redis cloud instance endpoint for caching and session storage
+      password: "${REDIS_PASSWORD}"  # Redis authentication password loaded from environment variable
+      username: "default"  # Redis username for ACL-based authentication
+      port: 12989  # Redis server port number
+      connection-timeout: 5000ms  # Max time to establish connection to Redis (5 seconds)
+      timeout: 2000ms  # Max time for Redis command execution (2 seconds)
   datasource:
-    url: jdbc:postgresql://aws-1-us-east-2.pooler.supabase.com:5432/postgres
-    username: postgres.trokusanuyoiouehviac
-    password: ${POSTGRES_PASSWORD}
-    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://aws-1-us-east-2.pooler.supabase.com:5432/postgres  # PostgreSQL connection URL with Supabase pooler for connection management
+    username: postgres.trokusanuyoiouehviac  # Database user with scoped permissions
+    password: ${POSTGRES_PASSWORD}  # Database password from environment variable for security
+    driver-class-name: org.postgresql.Driver  # JDBC driver for PostgreSQL database connectivity
 
-    hikari:
-      maximum-pool-size: 10
-      minimum-idle: 5
-      connection-timeout: 20000
-      idle-timeout: 300000
-      max-lifetime: 12000000
-      validation-timeout: 5000
-      pool-name: SpringBootHikariCP
+    hikari:  # HikariCP connection pool configuration for optimal database performance
+      maximum-pool-size: 10  # Max number of connections in pool to prevent database overload
+      minimum-idle: 5  # Min idle connections maintained for quick response times
+      connection-timeout: 20000  # Max wait time for connection from pool (20 seconds)
+      idle-timeout: 300000  # Time before idle connection is removed (5 minutes)
+      max-lifetime: 12000000  # Max connection lifetime to prevent stale connections (200 minutes)
+      validation-timeout: 5000  # Max time to validate connection health (5 seconds)
+      pool-name: SpringBootHikariCP  # Pool identifier for monitoring and debugging
       data-source-properties:
-        prepareThreshold: 5
-        preparedStatementCacheQueries: 256
-        preparedStatementCacheSizeMiB: 5
+        prepareThreshold: 5  # Number of uses before server prepares statement for performance
+        preparedStatementCacheQueries: 256  # Max cached prepared statements per connection
+        preparedStatementCacheSizeMiB: 5  # Memory limit for prepared statement cache
 
-        tcpKeepAlive: true
-        socketTimeout: 30
-        connectTimeout: 10
+        tcpKeepAlive: true  # Enable TCP keepalive to detect dead connections
+        socketTimeout: 30  # Socket read timeout in seconds to prevent hanging queries
+        connectTimeout: 10  # Initial connection establishment timeout in seconds
   jpa:
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true
-        show_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect  # SQL dialect for PostgreSQL-specific features
+        format_sql: true  # Pretty-print SQL queries in logs for debugging
+        show_sql: true  # Log all SQL statements for development monitoring
+  rabbitmq:
+    host: "possum.lmq.cloudamqp.com"  # CloudAMQP hosted RabbitMQ instance for message queuing
+    username: "hnpkhkoz"  # RabbitMQ virtual host username
+    password: "${RABBITMQ_PASSWORD}"  # RabbitMQ password from environment variable
+    ssl:
+        enabled: true  # Enable SSL/TLS for secure message broker communication
+    virtual-host: "hnpkhkoz"  # Isolated namespace for queue and exchange management
+    listener:
+      simple:
+        acknowledge-mode: auto  # Automatic message acknowledgment after successful processing
+        concurrency: 1  # Min number of concurrent message consumers
+        max-concurrency: 3  # Max concurrent consumers for load handling
+        prefetch: 10  # Number of messages to prefetch for each consumer
+        default-requeue-rejected: true  # Requeue failed messages for retry
+        retry:
+          enabled: true  # Enable automatic retry for failed message processing
+          initial-interval: 1000ms  # First retry delay (1 second)
+          max-interval: 10000ms  # Maximum retry delay (10 seconds)
+          max-attempts: 3  # Total retry attempts before message goes to DLQ
+          multiplier: 2  # Exponential backoff multiplier for retry delays
 
 jwt:
-  secret: ${JWT_SECRET_BASE64}
+  secret: ${JWT_SECRET_BASE64}  # Base64-encoded secret key for JWT token signing and validation
 
 chirp:
   email:
     verification:
-      expiry-hours: 24
+      expiry-hours: 24  # Email verification link validity period (24 hours)
     reset-password:
-      expiry-minutes: 30
+      expiry-minutes: 30  # Password reset token validity period (30 minutes)
 
 nginx:
-  trusted-ips:
-    - "127.0.0.1" #nginx on same machine
-    - "::1"       #localhost ipv6
-    - "172.17.0.0/16" # nginx container IP when using docker-compose
-    - "10.0.0.5/32" #nginx server IP when using cloud server
+  trusted-ips:  # IP addresses allowed to set X-Forwarded-For headers for accurate client IP detection
+    - "127.0.0.1"  # Nginx on same machine (localhost IPv4)
+    - "::1"  # Localhost IPv6 address
+    - "172.17.0.0/16"  # Docker network range for containerized nginx
+    - "10.0.0.5/32"  # Specific nginx server IP in cloud infrastructure
