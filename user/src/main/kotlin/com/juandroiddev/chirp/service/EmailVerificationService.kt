@@ -1,5 +1,6 @@
 package com.juandroiddev.chirp.service
 
+import com.juandroiddev.chirp.domain.events.user.UserEvent
 import com.juandroiddev.chirp.domain.exception.InvalidTokenException
 import com.juandroiddev.chirp.domain.exception.UserNotFoundException
 import com.juandroiddev.chirp.domain.model.EmailVerificationToken
@@ -8,6 +9,7 @@ import com.juandroiddev.chirp.infra.database.mappers.toEmailVerificationToken
 import com.juandroiddev.chirp.infra.database.mappers.toUser
 import com.juandroiddev.chirp.infra.database.repositories.EmailVerificationTokenRepository
 import com.juandroiddev.chirp.infra.database.repositories.UserRepository
+import com.juandroiddev.chirp.infra.message_queue.EventPublisher
 import jakarta.transaction.Transactional
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.scheduling.annotation.Scheduled
@@ -20,14 +22,29 @@ class EmailVerificationService(
     private val emailVerificationTokenRepository: EmailVerificationTokenRepository,
     private val userRepository: UserRepository,
     @param:Value("\${chirp.email.verification.expiry-hours}")
-    private val expiryHours:Long
+    private val expiryHours:Long,
+    private val eventPublisher: EventPublisher
+
 ) {
+    @Transactional
     fun resendVerification(email: String) {
-        // TODO: Implement resend verification email logic
+        val token = createVerificationToken(email)
+
+        if (token.user.hasEmailVerified){
+            return
+        }
+        eventPublisher.publish(
+            UserEvent.RequestResendVerification(
+                userId = token.user.id,
+                email = token.user.email,
+                username = token.user.username,
+                verificationToken = token.token
+            )
+        )
     }
 
     @Transactional
-    fun createVerification(email: String): EmailVerificationToken{
+    fun createVerificationToken(email: String): EmailVerificationToken{
         val userEntity = userRepository.findByEmail(email)
             ?: throw UserNotFoundException()
 
