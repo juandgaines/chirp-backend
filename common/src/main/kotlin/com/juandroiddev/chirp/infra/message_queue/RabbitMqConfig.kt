@@ -2,31 +2,39 @@ package com.juandroiddev.chirp.infra.message_queue
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.juandroiddev.chirp.domain.events.ChirpEvent
 import com.juandroiddev.chirp.domain.events.user.UserEventConstants
+import org.springframework.amqp.core.BindingBuilder
 import org.springframework.amqp.core.Queue
 import org.springframework.amqp.core.TopicExchange
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory
 import org.springframework.amqp.rabbit.connection.ConnectionFactory
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter
 import org.springframework.amqp.support.converter.Jackson2JavaTypeMapper
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.transaction.PlatformTransactionManager
+import org.springframework.transaction.annotation.EnableTransactionManagement
 
 @Configuration
+@EnableTransactionManagement
 class RabbitMqConfig {
 
     @Bean
     fun messageConverter(): Jackson2JsonMessageConverter {
         val objectMapper = ObjectMapper().apply {
             registerModule(KotlinModule.Builder().build())
+            registerModule(JavaTimeModule())
             findAndRegisterModules()
 
             val polymorphicTypeValidator = BasicPolymorphicTypeValidator.builder()
-                .allowIfSubType(ChirpEvent::class.java)
-                .allowIfSubType("java.util.")// Allow java list
-                .allowIfSubType("kotlin.collections.")// Allow kotlin list
+                .allowIfBaseType(ChirpEvent::class.java)
+                .allowIfSubType("java.util.") // Allow Java collections
+                .allowIfSubType("java.time.") // Allow Java time classes
+                .allowIfSubType("kotlin.collections.") // Allow Kotlin collections
                 .build()
 
             activateDefaultTyping(
@@ -59,10 +67,30 @@ class RabbitMqConfig {
     )
 
     @Bean
+    fun rabbitListenerContainerFactory(
+        connectionFactory: ConnectionFactory,
+        transactionManager: PlatformTransactionManager
+    ): SimpleRabbitListenerContainerFactory{
+        return SimpleRabbitListenerContainerFactory().apply {
+            this.setConnectionFactory(connectionFactory)
+            this.setTransactionManager(transactionManager)
+            this.setChannelTransacted(true)
+        }
+    }
+
+    @Bean
     fun notificationUserEventQueue() = Queue(
         MessageQueues.NOTIFICATION_USER_EVENTS,
         true,
         false,
         false
     )
+    @Bean
+    fun bindNotificationUserEventQueueToExchange(
+        notificationUserEventQueue: Queue,
+        userExchange: TopicExchange
+    ) = BindingBuilder
+        .bind(notificationUserEventQueue)
+        .to(userExchange)
+        .with("user.*")
 }

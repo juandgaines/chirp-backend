@@ -15,11 +15,11 @@ class EventPublisher(
     fun <T: ChirpEvent> publish(event: T) {
         try{
             rabbitTemplate.convertAndSend(
-                event.eventKey,
-                event.eventKey,
+                event.exchange,  // Use the exchange from the event
+                event.eventKey,   // Use eventKey as the routing key
                 event
             )
-            logger.info("Successfully published event: ${event.eventKey}")
+            logger.info("Successfully published event: ${event.eventKey} to exchange: ${event.exchange}")
         }catch (e: Exception) {
             logger.error("Failed to publish event: ${event.eventKey}", e)
         }
