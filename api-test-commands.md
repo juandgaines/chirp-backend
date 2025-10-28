@@ -81,7 +81,7 @@ curl -X POST http://localhost:8080/api/auth/change-password \
 curl -X POST http://localhost:8080/api/auth/resend-verification \
   -H "Content-Type: application/json" \
   -d '{
-    "email": "testuser1@example.com"
+    "email": "testuserrsb4@example.com"
   }'
 ```
 
