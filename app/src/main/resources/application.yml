@@ -37,6 +37,16 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect  # SQL dialect for PostgreSQL-specific features
         format_sql: true  # Pretty-print SQL queries in logs for debugging
         show_sql: true  # Log all SQL statements for development monitoring
+
+  mail:
+    port: 587  # SMTP port for email sending
+    password: "${MAILGUN_PASSWORD}"  # SMTP password from environment variable for secure email sending
+    properties:
+      mail:
+        smtp:
+          auth: true  # Enable SMTP authentication
+          starttls:
+            enable: true  # Enable STARTTLS for secure email transmission
   rabbitmq:
     host: "possum.lmq.cloudamqp.com"  # CloudAMQP hosted RabbitMQ instance for message queuing
     username: "hnpkhkoz"  # RabbitMQ virtual host username
@@ -63,6 +73,7 @@ jwt:
 
 chirp:
   email:
+    from: juandavidgaines@gmail.com
     verification:
       expiry-hours: 24  # Email verification link validity period (24 hours)
     reset-password:

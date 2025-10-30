@@ -11,8 +11,12 @@
 
     <div class="text-center">
         <a th:href="${verificationUrl}" class="button" style="color: blue;">Verify Email Address</a>
-        <a th:href="${devVerificationUrl}" class="button" style="color: blue;">Development Link</a>
     </div>
+
+    <p style="margin-top: 20px; font-size: 12px; color: #6c757d;">
+        Or copy and paste this URL into your browser:<br/>
+        <code th:text="${verificationUrl}" style="word-break: break-all; background-color: #f8f9fa; padding: 8px; display: inline-block; margin-top: 5px;">verification-url</code>
+    </p>
 
     <div class="text-muted" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e9ecef;">
         <p><strong>Why verify?</strong></p>

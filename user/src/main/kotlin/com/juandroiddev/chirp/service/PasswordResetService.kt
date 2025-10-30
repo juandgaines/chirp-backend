@@ -1,11 +1,13 @@
 package com.juandroiddev.chirp.service
 
+import com.juandroiddev.chirp.domain.events.user.UserEvent
 import com.juandroiddev.chirp.domain.exception.*
 import com.juandroiddev.chirp.domain.type.UserId
 import com.juandroiddev.chirp.infra.database.entities.PasswordResetTokenEntity
 import com.juandroiddev.chirp.infra.database.repositories.PasswordResetTokenRepository
 import com.juandroiddev.chirp.infra.database.repositories.RefreshTokenRepository
 import com.juandroiddev.chirp.infra.database.repositories.UserRepository
+import com.juandroiddev.chirp.infra.message_queue.EventPublisher
 import com.juandroiddev.chirp.infra.security.PasswordEncoder
 import jakarta.transaction.Transactional
 import org.springframework.beans.factory.annotation.Value
@@ -17,6 +19,7 @@ import java.time.temporal.ChronoUnit
 
 @Service
 class PasswordResetService (
+    private val eventPublisher: EventPublisher,
     private val userRepository: UserRepository,
     private val passwordResetTokenRepository: PasswordResetTokenRepository,
     private val passwordEncoder: PasswordEncoder,
@@ -39,7 +42,15 @@ class PasswordResetService (
 
         passwordResetTokenRepository.save(token)
 
-        // TODO: Inform notification service to send email
+       eventPublisher.publish(
+           UserEvent.RequestResetPassword(
+                userId = user.id!!,
+                email = user.email,
+                username = user.username,
+                passwordResetToken = token.token,
+                expiresInMinutes = expiryMinutes
+           )
+       )
 
     }
 
