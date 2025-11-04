@@ -1,4 +1,4 @@
-package com.juandroiddev.chirp.infra.database
+package com.juandroiddev.chirp.infra.database.repositories
 
 import com.juandroiddev.chirp.domain.type.UserId
 import com.juandroiddev.chirp.infra.database.entities.ChatParticipantEntity
@@ -14,6 +14,6 @@ interface ChatParticipantRepository {
         """
     )
 
-    fun findByEmailOrUsername(query:String):ChatParticipantEntity?
+    fun findByEmailOrUsername(query:String): ChatParticipantEntity?
 
 }
