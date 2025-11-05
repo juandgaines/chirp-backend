@@ -1,4 +1,4 @@
-package com.juandroiddev.chirp.models
+package com.juandroiddev.chirp.domain.models
 
 import com.juandroiddev.chirp.domain.type.ChatId
 import java.time.Instant
