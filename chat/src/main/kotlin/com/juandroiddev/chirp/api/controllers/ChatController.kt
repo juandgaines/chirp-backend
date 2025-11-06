@@ -23,7 +23,6 @@ class ChatController(
         @RequestBody
         request: CreateChatRequest
     ): ChatDto {
-        // Implementation goes here
         return chatService.createChat(
             creatorId = requestUserId,
             otherUserIds = request.otherUsersIds.toSet()
