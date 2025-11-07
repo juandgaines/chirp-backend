@@ -67,6 +67,29 @@ class RabbitMqConfig {
     )
 
     @Bean
+    fun chatExchange() = TopicExchange(
+        UserEventConstants.USER_EXCHANGE,
+        true,
+        false
+    )
+    @Bean
+    fun notificationUserEventQueue() = Queue(
+        MessageQueues.NOTIFICATION_USER_EVENTS,
+        true,
+        false,
+        false
+    )
+
+    @Bean
+    fun chatUserEventQueue() = Queue(
+        MessageQueues.CHAT_USER_EVENTS,
+        true,
+        false,
+        false
+    )
+
+
+    @Bean
     fun rabbitListenerContainerFactory(
         connectionFactory: ConnectionFactory,
         transactionManager: PlatformTransactionManager,
@@ -80,19 +103,22 @@ class RabbitMqConfig {
         }
     }
 
-    @Bean
-    fun notificationUserEventQueue() = Queue(
-        MessageQueues.NOTIFICATION_USER_EVENTS,
-        true,
-        false,
-        false
-    )
+
     @Bean
     fun bindNotificationUserEventQueueToExchange(
         notificationUserEventQueue: Queue,
         userExchange: TopicExchange
     ) = BindingBuilder
         .bind(notificationUserEventQueue)
+        .to(userExchange)
+        .with("user.*")
+
+    @Bean
+    fun bindChatUserEventQueueToExchange(
+        chatUserEventQueue: Queue,
+        userExchange: TopicExchange
+    ) = BindingBuilder
+        .bind(chatUserEventQueue)
         .to(userExchange)
         .with("user.*")
 }

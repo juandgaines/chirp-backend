@@ -23,23 +23,22 @@ class ChatService (
         creatorId: UserId,
         otherUserIds: Set<UserId>
     ): Chat {
+        val creator = chatParticipantRepository.findByIdOrNull(creatorId)
+            ?: throw ChatParticipantNotFoundException(creatorId)
+
         val otherParticipants = chatParticipantRepository.findByUserIdIn(
             userIds = otherUserIds
         )
 
-        val allParticipant = (otherParticipants + creatorId)
-        if (allParticipant.size < 2){
+        val allParticipants = setOf(creator) + otherParticipants
+        if (allParticipants.size < 2){
             throw InvalidChatSizeException()
         }
-
-        val creator = chatParticipantRepository.findByIdOrNull(creatorId)
-            ?: throw ChatParticipantNotFoundException(creatorId)
-
 
         return chatRepository.save(
             ChatEntity(
                 creator = creator,
-                participants = setOf(creator) + otherParticipants
+                participants = allParticipants
             )
         ).toChat()
 

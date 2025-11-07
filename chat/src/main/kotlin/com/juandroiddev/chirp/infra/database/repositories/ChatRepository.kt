@@ -9,10 +9,11 @@ import org.springframework.data.jpa.repository.Query
 interface ChatRepository : JpaRepository<ChatEntity, ChatId>{
     @Query(
         """
-            SELECT FROM ChatEntity c
+            SELECT c
+            FROM ChatEntity c
             LEFT JOIN FETCH c.participants
             LEFT JOIN FETCH c.creator
-            WHERE c.id = :id 
+            WHERE c.id = :id
             AND EXISTS (
                 SELECT 1
                 FROM c.participants p
@@ -25,7 +26,7 @@ interface ChatRepository : JpaRepository<ChatEntity, ChatId>{
     @Query(
         """
             SELECT c
-            FROM CHatEntity c
+            FROM ChatEntity c
             LEFT JOIN FETCH c.participants
             LEFT JOIN FETCH c.creator
             WHERE EXISTS (

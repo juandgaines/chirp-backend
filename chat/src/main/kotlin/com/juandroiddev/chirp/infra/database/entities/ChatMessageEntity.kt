@@ -24,7 +24,7 @@ class ChatMessageEntity (
     var id: ChatMessageId? = null,
     @Column(nullable = false)
     var content: String,
-    @JoinColumn(
+    @Column(
         name = "chat_id",
         nullable = false,
         updatable = false
@@ -37,7 +37,8 @@ class ChatMessageEntity (
         insertable = false,
         updatable = false
     )
-    var chatEntity: ChatEntity? = null,
+    var chat: ChatEntity? = null,
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(
         name = "sender_id",
         nullable = false,
@@ -45,6 +46,7 @@ class ChatMessageEntity (
         updatable = false
     )
     var sender : ChatParticipantEntity? = null,
+    @Column(name = "created_at")
     @CreationTimestamp
     var createdAt: Instant = Instant.now(),
 )

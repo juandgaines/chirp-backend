@@ -9,6 +9,6 @@ data class CreateChatRequest @JsonCreator  constructor(
     @field:Size(min = 1,
         message = "Chat must have at least 2 unique participants."
     )
-    @JsonProperty
+    @JsonProperty("otherUsersIds")
     val otherUsersIds: List<UserId>
 )
