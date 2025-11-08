@@ -1,5 +1,6 @@
 package com.juandroiddev.chirp.infra.database.repositories
 
+import com.juandroiddev.chirp.domain.type.ChatId
 import com.juandroiddev.chirp.domain.type.ChatMessageId
 import com.juandroiddev.chirp.infra.database.entities.ChatMessageEntity
 import org.springframework.data.domain.Pageable
@@ -39,6 +40,6 @@ interface ChatMessageRepository: JpaRepository<ChatMessageEntity, ChatMessageId>
         """
     )
     fun findLatestMessagesByChatIds(
-        chatIds: Set<String>,
+        chatIds: Set<ChatId>,
     ): Slice<ChatMessageEntity>
 }

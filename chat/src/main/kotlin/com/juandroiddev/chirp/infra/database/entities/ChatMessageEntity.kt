@@ -4,6 +4,8 @@ import com.juandroiddev.chirp.domain.type.ChatId
 import com.juandroiddev.chirp.domain.type.ChatMessageId
 import jakarta.persistence.*
 import org.hibernate.annotations.CreationTimestamp
+import org.hibernate.annotations.OnDelete
+import org.hibernate.annotations.OnDeleteAction
 import java.time.Instant
 
 
@@ -37,6 +39,7 @@ class ChatMessageEntity (
         insertable = false,
         updatable = false
     )
+    @OnDelete( action =  OnDeleteAction.CASCADE)
     var chat: ChatEntity? = null,
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(
@@ -45,7 +48,7 @@ class ChatMessageEntity (
         insertable = false,
         updatable = false
     )
-    var sender : ChatParticipantEntity? = null,
+    var sender : ChatParticipantEntity,
     @Column(name = "created_at")
     @CreationTimestamp
     var createdAt: Instant = Instant.now(),
