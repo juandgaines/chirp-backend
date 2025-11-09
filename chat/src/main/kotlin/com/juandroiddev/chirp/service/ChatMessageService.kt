@@ -29,22 +29,6 @@ class ChatMessageService (
     private val chatParticipantRepository: ChatParticipantRepository
 ){
 
-    fun getChatMessage(
-        chatId: ChatId,
-        before: Instant? = null,
-        pageSize: Int
-    ): List<ChatMessageDto>{
-        return chatMessageRepository
-            .findByChatIdBefore(
-                chatId = chatId,
-                before = before ?: Instant.now(),
-                pageable = PageRequest.of(0, pageSize)
-            )
-            .content
-            .asReversed()
-            .map { it.toChatMessage().toChatMessageDto() }
-    }
-
     @Transactional
     fun sendMessage(
         chatId: ChatId,
