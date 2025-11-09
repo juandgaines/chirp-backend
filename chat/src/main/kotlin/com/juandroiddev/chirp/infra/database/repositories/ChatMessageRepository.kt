@@ -19,7 +19,7 @@ interface ChatMessageRepository: JpaRepository<ChatMessageEntity, ChatMessageId>
         ORDER BY m.createdAt DESC
     """)
     fun findByChatIdBefore(
-        chatId: String,
+        chatId: ChatId,
         before: Instant,
         pageable: Pageable
     ): Slice<ChatMessageEntity>
