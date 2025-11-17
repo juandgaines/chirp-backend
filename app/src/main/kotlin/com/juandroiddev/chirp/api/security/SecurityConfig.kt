@@ -1,4 +1,4 @@
-package com.juandroiddev.chirp.security
+package com.juandroiddev.chirp.api.security
 
 import com.juandroiddev.chirp.api.config.JWTAuthFilter
 import jakarta.servlet.DispatcherType
