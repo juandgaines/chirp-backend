@@ -56,6 +56,34 @@ class ChatService (
             .map { it.toChatMessage().toChatMessageDto() }
     }
 
+    fun getChatById(
+        chatId: ChatId,
+        requestUserId: UserId
+    ): Chat? {
+        return  chatRepository.findChatById(
+            id = chatId,
+            userId = requestUserId
+        )?.toChat(lastMessageForChat(chatId))
+    }
+
+    @Transactional
+    fun findChatsByUserId(
+        userId: UserId
+    ): List<Chat> {
+        val chatsEntities = chatRepository.findAllByUserId(userId)
+
+        val latestMessages = chatMessageRepository.findLatestMessagesByChatIds(
+            chatIds = chatsEntities.mapNotNull { it.id }.toSet()
+        ).associateBy { it.chatId }
+
+
+        return chatsEntities.map {
+            it.toChat(
+                lastMessage = latestMessages[it.id]?.toChatMessage()
+            )
+        }.sortedByDescending { it.lastActivityAt }
+    }
+
     @Transactional
     fun createChat(
         creatorId: UserId,

@@ -9,7 +9,9 @@ import com.juandroiddev.chirp.api.util.requestUserId
 import com.juandroiddev.chirp.domain.type.ChatId
 import com.juandroiddev.chirp.service.ChatService
 import jakarta.validation.Valid
+import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ResponseStatusException
 import java.time.Instant
 
 
@@ -22,6 +24,7 @@ class ChatController(
     companion object{
         private const val DEFAULT_PAGE_SIZE = 20
     }
+
     @GetMapping("/{chatId}/messages")
     fun getMessagesForChat(
         @PathVariable(name = "chatId")
@@ -34,6 +37,27 @@ class ChatController(
             before = before,
             pageSize = pageSize
         )
+    }
+
+    @GetMapping("/{chatId}")
+    fun getChat(
+        @PathVariable
+        chatId: ChatId,
+    ): ChatDto {
+        return chatService.getChatById(
+            chatId = chatId,
+            requestUserId = requestUserId
+        )?.toChatDto()?: throw ResponseStatusException(
+            HttpStatus.NOT_FOUND,
+            "Chat with id $chatId not found."
+        )
+    }
+
+    @GetMapping
+    fun getChatsForUser(): List<ChatDto>{
+        return chatService.findChatsByUserId(
+            userId = requestUserId,
+        ).map { it.toChatDto() }
     }
 
     @PostMapping
