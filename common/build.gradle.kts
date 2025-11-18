@@ -19,6 +19,9 @@ dependencies {
     api(libs.jackson.datatype.jsr310)
     implementation(libs.spring.boot.starter.amqp)
     implementation(libs.spring.boot.starter.security)
+    implementation(libs.jwt.api)
+    implementation(libs.jwt.impl)
+    implementation(libs.jwt.jackson)
     testImplementation(kotlin("test"))
 
 }

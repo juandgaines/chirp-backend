@@ -1,7 +1,6 @@
 package com.juandroiddev.chirp.service
 
 import com.juandroiddev.chirp.domain.exception.InvalidTokenException
-
 import com.juandroiddev.chirp.domain.type.UserId
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
