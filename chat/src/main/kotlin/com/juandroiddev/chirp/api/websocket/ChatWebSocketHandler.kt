@@ -1,5 +1,13 @@
 package com.juandroiddev.chirp.api.websocket
 
+import com.fasterxml.jackson.databind.JsonMappingException
+import com.juandroiddev.chirp.api.dto.ws.ErrorDto
+import com.juandroiddev.chirp.api.dto.ws.IncomingWebSocketEventType
+import com.juandroiddev.chirp.api.dto.ws.IncomingWebSocketMessage
+import com.juandroiddev.chirp.api.dto.ws.OutgoingWebSocketEventType
+import com.juandroiddev.chirp.api.dto.ws.OutgoingWebSocketMessage
+import com.juandroiddev.chirp.api.dto.ws.SendMessageDto
+import com.juandroiddev.chirp.api.mappers.toChatMessageDto
 import com.juandroiddev.chirp.domain.type.ChatId
 import com.juandroiddev.chirp.domain.type.UserId
 import com.juandroiddev.chirp.service.ChatMessageService
@@ -9,11 +17,14 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Component
 import org.springframework.web.socket.CloseStatus
+import org.springframework.web.socket.TextMessage
+import org.springframework.web.socket.WebSocketMessage
 import org.springframework.web.socket.WebSocketSession
 import org.springframework.web.socket.handler.TextWebSocketHandler
 import tools.jackson.databind.ObjectMapper
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.locks.ReentrantReadWriteLock
+import kotlin.concurrent.read
 import kotlin.concurrent.write
 
 @Component
@@ -87,6 +98,139 @@ class ChatWebSocketHandler(
         }
 
         logger.info("WebSocket connection established for user $userId with session ${session.id}")
+
+    }
+
+    override fun handleTextMessage(session: WebSocketSession, message: TextMessage) {
+        logger.debug("Received message on session ${session.id}: ${message.payload}")
+
+        val userSession = connectionLock.read {
+            sessions[session.id]
+        } ?: return
+
+        try {
+            val webSocketMessage = objectMapper.readValue(
+                message.payload,
+                IncomingWebSocketMessage::class.java
+            )
+
+            when(webSocketMessage.type){
+                IncomingWebSocketEventType.NEW_MESSAGE -> {
+                    val dto = objectMapper.readValue(
+                        webSocketMessage.payload,
+                        SendMessageDto::class.java
+                    )
+                    handleSendMessage(
+                        dto = dto,
+                        senderId = userSession.userId,
+                    )
+                }
+            }
+        }
+        catch (e: JsonMappingException){
+            logger.error("Couldn't map incoming WebSocket message to DTO ${message.payload}",e)
+            sendError(
+                session = session,
+                errorMessage = ErrorDto(
+                    code = "INVALID_JSON",
+                    message = "Incoming  JSON or UUID is invalid"
+                )
+            )
+        }
+    }
+
+    private fun sendError(
+        session: WebSocketSession,
+        errorMessage: ErrorDto
+    ){
+        val webSocketMessage = objectMapper.writeValueAsString(
+            OutgoingWebSocketMessage(
+                type = OutgoingWebSocketEventType.ERROR,
+                payload = objectMapper.writeValueAsString(errorMessage)
+            )
+        )
+        try {
+            session.sendMessage(TextMessage(webSocketMessage))
+        }
+        catch (e: Exception){
+            logger.error("Couldn't send error messages",e)
+        }
+    }
+
+    private fun broadcastToChat(
+        chatId: ChatId,
+        message: OutgoingWebSocketMessage
+    ){
+        val chatSessions = connectionLock.read {
+            chatToSessions[chatId]?.toList()?: emptyList()
+        }
+
+        chatSessions.forEach { sessionId ->
+
+            val userSession = connectionLock.read {
+                sessions[sessionId]
+            }?: return@forEach
+
+            sendToUser(
+                userId = userSession.userId,
+                message = message
+            )
+
+        }
+    }
+
+    private fun handleSendMessage(
+        dto: SendMessageDto,
+        senderId: UserId,
+    ){
+        val userChats = connectionLock.read {
+            userChatIds[senderId]
+        }?: return
+
+        if (dto.chatId !in userChats){
+            logger.warn("User $senderId attempted to send message to chat ${dto.chatId} they do not belong to.")
+            return
+        }
+        val savedMessage = chatMessageService.sendMessage(
+            chatId = dto.chatId,
+            senderId = senderId,
+            content = dto.content,
+            messageId = dto.messageId
+        )
+
+        broadcastToChat(
+            chatId = dto.chatId,
+            message = OutgoingWebSocketMessage(
+                type = OutgoingWebSocketEventType.NEW_MESSAGE,
+                payload = objectMapper.writeValueAsString(
+                    savedMessage.toChatMessageDto()
+                )
+            )
+        )
+
+    }
+
+    private fun sendToUser(userId: UserId,message: OutgoingWebSocketMessage){
+        val userSessions = connectionLock.read {
+            userToSessions[userId]?: emptySet()
+        }
+
+        userSessions.forEach { sessionId ->
+            val userSession = connectionLock.read {
+                sessions[sessionId] ?: return@forEach
+            }
+            if (userSession.session.isOpen){
+                try{
+                    val messageJson = objectMapper.writeValueAsString(message)
+                    userSession.session.sendMessage(TextMessage(messageJson))
+                    logger.info("Sent message to user $userId on session $sessionId: $message")
+                }catch (e: Exception){
+                    logger.error("Error while sending message to user $userId on session $sessionId",e)
+                }
+            }
+
+
+        }
 
     }
 
