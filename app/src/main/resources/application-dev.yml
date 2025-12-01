@@ -21,3 +21,7 @@ chirp:
       apply-limit: true
   web-socket:
     allowed-origins: "http://localhost:8080"
+
+logging:
+  level:
+    com.juandroid.chirp: DEBUG

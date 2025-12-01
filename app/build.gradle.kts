@@ -14,6 +14,9 @@ dependencies {
     implementation(projects.notification)
     implementation(projects.common)
     implementation(libs.kotlin.reflect)
+    implementation(libs.jackson.databind)
+    implementation(libs.jackson.module.kotlin)
+    implementation(libs.jackson.datatype.jsr310)
 
     implementation(libs.spring.boot.starter.security)
 

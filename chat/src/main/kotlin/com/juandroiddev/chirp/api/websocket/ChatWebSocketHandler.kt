@@ -19,7 +19,7 @@ import org.springframework.transaction.event.TransactionPhase
 import org.springframework.transaction.event.TransactionalEventListener
 import org.springframework.web.socket.*
 import org.springframework.web.socket.handler.TextWebSocketHandler
-import tools.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.ObjectMapper
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
@@ -146,6 +146,7 @@ class ChatWebSocketHandler(
 
             when(webSocketMessage.type){
                 IncomingWebSocketEventType.NEW_MESSAGE -> {
+                    logger.info("Sent new message from user[before] ${userSession.userId}  ")
                     val dto = objectMapper.readValue(
                         webSocketMessage.payload,
                         SendMessageDto::class.java
@@ -154,6 +155,8 @@ class ChatWebSocketHandler(
                         dto = dto,
                         senderId = userSession.userId,
                     )
+
+                    logger.info("Sent new message from user ${userSession.userId}  ")
                 }
             }
         }
