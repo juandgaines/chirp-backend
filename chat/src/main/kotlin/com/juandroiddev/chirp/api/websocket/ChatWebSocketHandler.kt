@@ -17,11 +17,7 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import org.springframework.transaction.event.TransactionPhase
 import org.springframework.transaction.event.TransactionalEventListener
-import org.springframework.web.socket.CloseStatus
-import org.springframework.web.socket.PingMessage
-import org.springframework.web.socket.PongMessage
-import org.springframework.web.socket.TextMessage
-import org.springframework.web.socket.WebSocketSession
+import org.springframework.web.socket.*
 import org.springframework.web.socket.handler.TextWebSocketHandler
 import tools.jackson.databind.ObjectMapper
 import java.util.concurrent.ConcurrentHashMap
@@ -105,6 +101,34 @@ class ChatWebSocketHandler(
 
         logger.info("WebSocket connection established for user $userId with session ${session.id}")
 
+    }
+
+    override fun afterConnectionClosed(session: WebSocketSession, status: CloseStatus) {
+        connectionLock.write {
+            sessions.remove(session.id)?.let { userSession ->
+                val userId = userSession.userId
+
+                userToSessions.compute(userId){_, sessions ->
+                    sessions
+                        ?.apply { remove(session.id) }
+                        ?.takeIf { it.isNotEmpty() }
+                }
+
+                userChatIds[userId]?.forEach { chatId ->
+                    chatToSessions.compute(chatId){ _, sessions ->
+                        sessions
+                            ?.apply { remove(session.id) }
+                            ?.takeIf { it.isNotEmpty() }
+                    }
+                }
+                logger.info("WebSocket connection closed for user $userId")
+            }
+        }
+    }
+
+    override fun handleTransportError(session: WebSocketSession, exception: Throwable) {
+        logger.error("Transport error on session ${session.id}", exception)
+        session.close(CloseStatus.SERVER_ERROR.withReason("Transport error"))
     }
 
     override fun handleTextMessage(session: WebSocketSession, message: TextMessage) {
