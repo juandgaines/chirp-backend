@@ -87,3 +87,6 @@ nginx:
     - "::1"  # Localhost IPv6 address
     - "172.17.0.0/16"  # Docker network range for containerized nginx
     - "10.0.0.5/32"  # Specific nginx server IP in cloud infrastructure
+supabase:
+  url: "https://aws-1-us-east-2.pooler.supabase.com"  # Supabase project URL for database and auth services
+  service-key: "${SUPABASE_SERVICE_KEY}"  # Supabase service key from environment variable for secure API access
