@@ -20,6 +20,7 @@ import org.springframework.transaction.event.TransactionalEventListener
 import org.springframework.web.socket.*
 import org.springframework.web.socket.handler.TextWebSocketHandler
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.juandroiddev.chirp.domain.event.ProfilePictureUpdatedEvent
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.concurrent.read
@@ -276,6 +277,49 @@ class ChatWebSocketHandler(
                 )
             )
         )
+    }
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    fun onProfilePictureUpdated(event: ProfilePictureUpdatedEvent) {
+
+        val userChats = connectionLock.read {
+            userChatIds[event.userId]?.toList() ?: emptyList()
+        }
+
+        val dto = ProfilePictureUpdateDto(
+            userId = event.userId,
+            newUrl = event.newUrl
+        )
+
+        val sessionsIds = mutableSetOf<String>()
+        userChats.forEach { chatId ->
+            connectionLock.read {
+                chatToSessions[chatId]?.let { sessions ->
+                    sessionsIds.addAll(sessions)
+                }
+            }
+        }
+
+        val webSocketMessage = OutgoingWebSocketMessage(
+            type = OutgoingWebSocketEventType.PROFILE_PICTURE_UPDATED,
+            payload = objectMapper.writeValueAsString(dto)
+        )
+        val messageJson = objectMapper.writeValueAsString(webSocketMessage)
+
+        sessionsIds.forEach { sessionId ->
+            val userSession = connectionLock.read {
+                sessions[sessionId]
+            } ?: return@forEach
+            try {
+                if (userSession.session.isOpen) {
+                    userSession.session.sendMessage(
+                        TextMessage(messageJson)
+                    )
+                }
+
+            } catch (e: Exception) {
+                logger.error("Could not send profile picture updates to session $sessionId", e)
+            }
+        }
     }
 
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
