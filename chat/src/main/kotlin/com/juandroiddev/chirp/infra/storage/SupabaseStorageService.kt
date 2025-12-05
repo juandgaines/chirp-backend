@@ -1,5 +1,8 @@
 package com.juandroiddev.chirp.infra.storage
 
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.juandroiddev.chirp.domain.exception.InvalidProfilePictureException
 import com.juandroiddev.chirp.domain.exception.StorageException
 import com.juandroiddev.chirp.domain.models.ProfilePictureUploadCredentials
@@ -32,7 +35,7 @@ class SupabaseStorageService(
             ?: throw InvalidProfilePictureException("Invalid mime type: $mimeType")
 
         val fileName = "user_${userId}_${UUID.randomUUID()}.$extension"
-        val path = "/profile_pictures/$fileName"
+        val path = "profile-pictures/$fileName"
 
         val publicUrl = "$supabaseUrl/storage/v1/object/public/$path"
 
@@ -78,7 +81,9 @@ class SupabaseStorageService(
         val response = supabaseRestClient
             .post()
             .uri("/storage/v1/object/upload/sign/$path")
+            .header( "Content-Type", "application/json")
             .body(json)
+
             .retrieve()
             .body(SignedUploadResponse::class.java)?: throw StorageException(
                 "Failed to create signed upload URL."
@@ -86,8 +91,9 @@ class SupabaseStorageService(
         return "$supabaseUrl/storage/v1${response.url}"
     }
 
-    private data class SignedUploadResponse(
-        val url: String
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private data class SignedUploadResponse @JsonCreator(mode = JsonCreator.Mode.PROPERTIES) constructor(
+        @JsonProperty("url") val url: String
     )
 
 }

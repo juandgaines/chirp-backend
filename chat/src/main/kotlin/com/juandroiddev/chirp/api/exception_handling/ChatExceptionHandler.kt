@@ -3,7 +3,9 @@ package com.juandroiddev.chirp.api.exception_handling
 import com.juandroiddev.chirp.domain.exception.ChatNotFoundException
 import com.juandroiddev.chirp.domain.exception.ChatParticipantNotFoundException
 import com.juandroiddev.chirp.domain.exception.InvalidChatSizeException
+import com.juandroiddev.chirp.domain.exception.InvalidProfilePictureException
 import com.juandroiddev.chirp.domain.exception.MessageNotFoundException
+import com.juandroiddev.chirp.domain.exception.StorageException
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
@@ -35,4 +37,27 @@ class ChatExceptionHandler {
             "status" to e.message
         )
     }
+
+    @ExceptionHandler(
+        InvalidProfilePictureException::class,
+    )
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun onInvalidProfilePicture(e: InvalidProfilePictureException): Map<String, Any?> {
+        return mapOf(
+            "code" to "INVALID_PROFILE_PICTURE",
+            "status" to e.message
+        )
+    }
+
+    @ExceptionHandler(
+        StorageException::class,
+    )
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    fun onInvalidProfilePicture(e: StorageException): Map<String, Any?> {
+        return mapOf(
+            "code" to "STORAGE_ERROR",
+            "status" to e.message
+        )
+    }
+
 }
