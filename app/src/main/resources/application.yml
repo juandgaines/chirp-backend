@@ -90,3 +90,6 @@ nginx:
 supabase:
   url: "https://trokusanuyoiouehviac.supabase.co"  # Supabase project URL for database and auth services
   service-key: "${SUPABASE_SERVICE_KEY}"  # Supabase service key from environment variable for secure API access
+
+firebase:
+  credentials-path: "classpath:firebase-credentials/chirp-firebase-adminsdk.json"  # Path to Firebase service account JSON for FCM integration
