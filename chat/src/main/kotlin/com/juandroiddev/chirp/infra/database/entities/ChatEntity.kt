@@ -41,7 +41,7 @@ class ChatEntity (
             ),
         ]
     )
-    var participants: Set<ChatParticipantEntity> = emptySet(),
+    var participants: Set<ChatParticipantEntity> = mutableSetOf(),
     @CreationTimestamp
     var createdAt: Instant = Instant.now(),
 
