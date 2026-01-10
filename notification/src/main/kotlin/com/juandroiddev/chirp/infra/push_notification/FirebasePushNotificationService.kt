@@ -50,7 +50,7 @@ class FirebasePushNotificationService (
         }
     }
 
-    fun sendNotification(notification: PushNotification) {
+    fun sendNotification(notification: PushNotification): PushNotificationSendResult {
         val mesages = notification.recipients.map { recipient ->
             Message.builder()
                 .setToken(recipient.token)
@@ -92,9 +92,11 @@ class FirebasePushNotificationService (
                 .build()
         }
 
-        val response = FirebaseMessaging.getInstance().sendEach(mesages)
+        val response = FirebaseMessaging.getInstance().sendEach(mesages).toSendResult(
+            allDeviceToken = notification.recipients
+        )
 
-
+        return response
 
     }
 
