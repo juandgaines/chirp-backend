@@ -30,7 +30,8 @@ class ChatMessageService (
     private val chatMessageRepository: ChatMessageRepository,
     private val chatParticipantRepository: ChatParticipantRepository,
     private val applicationEventPublisher: ApplicationEventPublisher,
-    private val eventPublisher: EventPublisher
+    private val eventPublisher: EventPublisher,
+    private val messageCacheEvictionHelper: MessageCacheEvictionHelper
 ){
 
     @Transactional
@@ -93,16 +94,6 @@ class ChatMessageService (
                 chatId = message.chatId
             )
         )
-        evictMessageCache(message.chatId)
-    }
-
-    @CacheEvict(
-        value = ["messages"],
-        key = "#chatId"
-    )
-    fun evictMessageCache(
-        chatId: ChatId
-    ){
-        //NO-OP: Let spring handle the cache eviction
+        messageCacheEvictionHelper.evictMessageCache(message.chatId)
     }
 }
