@@ -1,3 +1,5 @@
+import org.springframework.boot.gradle.tasks.bundling.BootJar
+
 plugins {
     id("chirp.spring-boot-app")
 }
@@ -6,6 +8,16 @@ group = "com.juandroiddev"
 version = "0.0.1-SNAPSHOT"
 description = "Chirp backend"
 
+tasks{
+    named<BootJar>("bootJar"){
+        from(project(":notification").projectDir.resolve("src/main/resources")){
+            into("")
+        }
+        from(project(":user").projectDir.resolve("src/main/resources")){
+            into("")
+        }
+    }
+}
 
 
 dependencies {
