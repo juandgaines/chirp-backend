@@ -2,6 +2,7 @@ package com.juandroiddev.chirp.service
 
 import com.juandroiddev.chirp.api.dto.ChatMessageDto
 import com.juandroiddev.chirp.api.mappers.toChatMessageDto
+import com.juandroiddev.chirp.domain.event.ChatCreatedEvent
 import com.juandroiddev.chirp.domain.event.ChatParticipantJoinedEvent
 import com.juandroiddev.chirp.domain.event.ChatParticipantLeftEvent
 import com.juandroiddev.chirp.domain.exception.ChatNotFoundException
@@ -101,12 +102,19 @@ class ChatService (
             throw InvalidChatSizeException()
         }
 
-        return chatRepository.save(
+        return chatRepository.saveAndFlush(
             ChatEntity(
                 creator = creator,
                 participants = allParticipants
             )
-        ).toChat()
+        ).toChat().also {
+            applicationPublisher.publishEvent(
+                ChatCreatedEvent(
+                    chatId = it.id,
+                    participantsIds = allParticipants.map { participant -> participant.userId }
+                )
+            )
+        }
 
     }
 

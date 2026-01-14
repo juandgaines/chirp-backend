@@ -20,6 +20,7 @@ import org.springframework.transaction.event.TransactionalEventListener
 import org.springframework.web.socket.*
 import org.springframework.web.socket.handler.TextWebSocketHandler
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.juandroiddev.chirp.domain.event.ChatCreatedEvent
 import com.juandroiddev.chirp.domain.event.ProfilePictureUpdatedEvent
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.locks.ReentrantReadWriteLock
@@ -247,17 +248,19 @@ class ChatWebSocketHandler(
         )
     }
 
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    fun onJoinChat(event: ChatParticipantJoinedEvent) {
+    private fun updateChatForUsers(
+        chatId: ChatId,
+        userIds:List<UserId>
+    ){
         connectionLock.write {
-            event.userId.forEach { userId ->
+            userIds.forEach { userId ->
                 userChatIds.compute(userId) { _, chatIds ->
                     (chatIds ?: mutableSetOf()).apply {
-                        add(event.chatId)
+                        add(chatId)
                     }
                 }
                 userToSessions[userId]?.forEach { sessionId->
-                    chatToSessions.compute(event.chatId) { _, sessionIds ->
+                    chatToSessions.compute(chatId) { _, sessionIds ->
                         (sessionIds ?: mutableSetOf()).apply {
                             add(sessionId)
                         }
@@ -265,6 +268,22 @@ class ChatWebSocketHandler(
                 }
             }
         }
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    fun onCreateChat(event: ChatCreatedEvent) {
+        updateChatForUsers(
+            chatId = event.chatId,
+            userIds = event.participantsIds.toList()
+        )
+    }
+
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    fun onJoinChat(event: ChatParticipantJoinedEvent) {
+        updateChatForUsers(
+            chatId = event.chatId,
+            userIds = event.userId.toList()
+        )
 
         broadcastToChat(
             chatId = event.chatId,
