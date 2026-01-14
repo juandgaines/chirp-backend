@@ -23,7 +23,7 @@ import java.time.Instant
 class ChatMessageEntity (
     @Id
     var id: ChatMessageId? = null,
-    @Column(nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false)
     var content: String,
     @Column(
         name = "chat_id",
