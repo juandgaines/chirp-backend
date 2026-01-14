@@ -21,6 +21,7 @@ import org.springframework.cache.annotation.CacheEvict
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import java.util.UUID
 
 
 @Service
@@ -51,7 +52,7 @@ class ChatMessageService (
 
         val savedMessage = chatMessageRepository.saveAndFlush(
             ChatMessageEntity(
-                id = messageId,
+                id = messageId ?: UUID.randomUUID(),
                 content = content.trim(),
                 chatId = chatId,
                 chat = chat,
